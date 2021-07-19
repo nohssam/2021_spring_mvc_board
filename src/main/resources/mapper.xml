@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<!-- mapper가 여러개 일때 namespace 로 구분한다. -->
+<mapper namespace="board">
+	<!-- 전체 게시물의 수 -->
+	<select id="count" resultType="int">
+		select count(*) from board
+	</select>
+	
+	<!-- 시작번호와 끝번호를 받아서 해당 리스트 출력   -->
+	<!--  원글은 카운트가 groups만 올라가고 step , lev 은 댓글 처리하면서 올라간다.-->
+	<!--  원글은 step과 lev은 무조건 0으로 만들어준다.  -->
+	<select id="list" parameterType="Map" resultType="com.ict.vo.VO">
+		select * from (
+			select rownum r_num, a.* from (
+				select * from board order by groups desc, lev asc
+			) a
+		) where r_num between #{begin} and #{end}
+	</select>
+	
+	
+</mapper>
+
+
+
+
+
+
+
