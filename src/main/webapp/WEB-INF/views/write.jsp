@@ -75,6 +75,7 @@ input{padding: 5px;}
 				<td colspan="2">
 				<input type="button" value="입력" onclick="write_ok(this.form)" /> 
 				<input type="button" value="목록" onclick="list_go(this.form)" /> 
+				<input type="hidden" name="cPage" value="${cPage}">
 				<input type="reset" value="취소" />
 				</td>
 			</tr>

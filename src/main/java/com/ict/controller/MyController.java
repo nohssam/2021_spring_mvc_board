@@ -1,17 +1,27 @@
 package com.ict.controller;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ict.service.MyService;
@@ -82,15 +92,137 @@ public class MyController {
 		return new ModelAndView("write");
 	}
 	@RequestMapping(value = "write_ok.do", method = RequestMethod.POST)
-	public ModelAndView writeOKCommand(VO vo) {
+	public ModelAndView writeOKCommand(VO vo, HttpServletRequest request,
+			@ModelAttribute("cPage")String cPage) {
 		try {
-			
+			String path = request.getSession().getServletContext().getRealPath("/resources/upload");
+			MultipartFile file = vo.getF_name();
+			if(file.isEmpty()) {
+				vo.setFile_name("");
+			}else {
+				vo.setFile_name(file.getOriginalFilename());
+			}
+			int result = myService.InsertVO(vo);
+			if(result>0) {
+				if(! vo.getFile_name().isEmpty()) {
+					byte[] in = file.getBytes();
+					File out = new File(path, vo.getFile_name());
+					FileCopyUtils.copy(in, out);
+				}
+				return new ModelAndView("redirect:list.do");
+			}else {
+				return new ModelAndView("redirect:write.do");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 		return null;
 	}
 	
+	@RequestMapping("onelist.do")
+	public ModelAndView oneListCommand(@ModelAttribute("cPage")String cPage,
+			@RequestParam("idx")String idx) {
+		try {
+			ModelAndView mv= new ModelAndView("onelist");
+			// 히트 업데이트
+			int result = myService.updateHit(idx);
+			// 상세 보기 
+			VO vo = myService.selectOneList(idx);
+			// 저장
+			mv.addObject("vo", vo);
+			return mv;
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+	@RequestMapping("download.do")
+	public void downCommand(@RequestParam("file_name")String file_name,
+			HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		FileInputStream fis = null;
+		BufferedInputStream bis = null;
+		BufferedOutputStream bos = null;
+		try {
+			String path = request.getSession().getServletContext().getRealPath("/resources/upload/"+file_name);
+			response.setContentType("application/x-msdownload");
+			response.setHeader("Content-Disposition","attachment; filename="+URLEncoder.encode(file_name,"utf-8"));
+			File file = new File(new String(path.getBytes("utf-8")));
+			fis = new FileInputStream(file);
+			bis = new BufferedInputStream(fis);
+			bos = new BufferedOutputStream(response.getOutputStream());
+			FileCopyUtils.copy(bis, bos);
+		} catch (Exception e) {
+			// TODO: handle exception
+		} finally {
+			try {
+				bos.close();
+				bis.close();
+				fis.close();
+			} catch (Exception e2) {
+			}
+		}
+	}
+	@RequestMapping("ans_write.do")
+	public ModelAndView Ans_WriteCommand(@ModelAttribute("cPage")String cPage,
+			@ModelAttribute("idx")String idx) {
+		return new ModelAndView("ans_write");
+	}
+	@RequestMapping(value = "ans_write_ok.do", method = RequestMethod.POST)
+	public ModelAndView Ans_Write_OKCommand(VO vo,HttpServletRequest request,
+			@ModelAttribute("cPage")String cPage) {
+		try {
+			// groups,step, lev 를 구하자 
+			VO vo2 = myService.selectOneList(vo.getIdx());
+			
+			// step, lev 1씩 증가 시키자 
+			int lev = Integer.parseInt(vo2.getLev());
+			int step = Integer.parseInt(vo2.getStep());
+			int groups = Integer.parseInt(vo2.getGroups());
+			
+			step ++;
+			lev ++ ;
+			
+			// DB에 groups, lev를 이용해서 업데이트를 한다.
+			// group이 같은 원글 찾아서 레벌이 같거나 크면 레벨을 증가 
+			Map<String, Integer> map = new HashMap<String, Integer>();
+			map.put("groups", groups);
+			map.put("lev", lev);
+			
+			 myService.updateLevUp(map);
+			
+			vo.setStep(String.valueOf(step));
+			vo.setLev(String.valueOf(lev));
+			vo.setGroups(String.valueOf(groups));
+			
+			// 파일 처리 
+			String path = request.getSession().getServletContext().getRealPath("/resources/upload");
+			
+			MultipartFile file = vo.getF_name();
+			if(file.isEmpty()) {
+				vo.setFile_name("");
+			}else {
+				vo.setFile_name(file.getOriginalFilename());
+			}
+			int result = myService.InsertAns(vo);
+		
+			if(result>0) {
+				if(! vo.getFile_name().isEmpty()) {
+					byte[] in = file.getBytes();
+					File out = new File(path, vo.getFile_name());
+					FileCopyUtils.copy(in, out);
+				}
+				return new ModelAndView("redirect:list.do?cPage="+cPage);
+			}else {
+				return new ModelAndView("redirect:ans_write.do?cPage="+cPage+"&idx="+vo.getIdx());
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
 }
 
 

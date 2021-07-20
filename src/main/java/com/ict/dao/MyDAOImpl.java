@@ -30,39 +30,35 @@ public class MyDAOImpl implements MyDAO{
 
 	@Override
 	public int InsertVO(VO vo) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return sqlSessionTemplate.insert("board.insert", vo);
 	}
 
 	@Override
 	public int updateHit(String idx) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return sqlSessionTemplate.update("board.updateHit", idx);
 	}
 
 	@Override
 	public VO selectOneList(String idx) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return sqlSessionTemplate.selectOne("board.oneList", idx);
 	}
 
 	@Override
 	public int updateLevUp(Map<String, Integer> map) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return sqlSessionTemplate.update("board.lev_up", map);
 	}
-
+	
+	@Override
+	public int InsertAns(VO vo) throws Exception {
+		return sqlSessionTemplate.insert("board.ans_insert", vo);
+	}
 	@Override
 	public int updateList(VO vo) throws Exception {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
-	public int InsertAns(VO vo) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	
 
 	@Override
 	public int delete(String groups) throws Exception {
