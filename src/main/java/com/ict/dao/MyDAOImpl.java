@@ -52,24 +52,26 @@ public class MyDAOImpl implements MyDAO{
 	public int InsertAns(VO vo) throws Exception {
 		return sqlSessionTemplate.insert("board.ans_insert", vo);
 	}
+	
+	@Override
+	public int selectPwdChk(VO vo) throws Exception {
+		return sqlSessionTemplate.selectOne("board.pwd_chk", vo);
+	}
 	@Override
 	public int updateList(VO vo) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return sqlSessionTemplate.update("board.update",vo);
 	}
 
 	
 
 	@Override
 	public int delete(String groups) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return sqlSessionTemplate.delete("board.delete", groups);
 	}
 
 	@Override
 	public int deleteAns(String idx) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return sqlSessionTemplate.delete("board.delete_ans", idx);
 	}
 
 }

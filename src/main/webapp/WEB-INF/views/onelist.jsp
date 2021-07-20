@@ -26,19 +26,19 @@ input{padding: 5px;}
 </style>
 <script type="text/javascript">
 	function list_go(f) {
-		f.action="list.do?cPage=${cPage}";
+		f.action="list.do";
 		f.submit();
 	}
 	function ans_write(f) {
-		f.action="ans_write.do?cPage=${cPage}";
+		f.action="ans_write.do";
 		f.submit();
 	}
 	function update_go(f) {
-		f.action="update.do?cPage=${cPage}";
+		f.action="update.do";
 		f.submit();
 	}
 	function delete_go(f) {
-		f.action="delete.do?cPage=${cPage}";
+		f.action="delete.do";
 		f.submit();
 	}
 </script>
@@ -84,6 +84,7 @@ input{padding: 5px;}
 				<input type="button" value="수정" onclick="update_go(this.form)" /> 
 				<input type="button" value="삭제" onclick="delete_go(this.form)" />
 				<input type="hidden" name="idx" value="${vo.idx }" >
+				<input type="hidden" name="cPage" value="${cPage}" >
 				</td>
 			</tr>
             </tbody>

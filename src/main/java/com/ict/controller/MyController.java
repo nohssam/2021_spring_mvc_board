@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +26,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.ict.service.MyService;
 import com.ict.service.Paging;
 import com.ict.vo.VO;
-import com.sun.prism.paint.Paint;
 
 @Controller
 public class MyController {
@@ -220,6 +218,88 @@ public class MyController {
 			
 		} catch (Exception e) {
 			System.out.println(e);
+		}
+		return null;
+	}
+	@RequestMapping("update.do")
+	public ModelAndView updateCommand(@ModelAttribute("cPage")String cPage,
+			@ModelAttribute("idx")String idx) {
+		try {
+			ModelAndView mv = new ModelAndView("update");
+			VO vo = myService.selectOneList(idx);
+			mv.addObject("vo", vo);
+			return mv;
+		} catch (Exception e) {
+		}
+		return null;
+	}
+	@RequestMapping("delete.do")
+	public ModelAndView deleteCommand(@ModelAttribute("cPage")String cPage,
+			@ModelAttribute("idx")String idx) {
+		try {
+			return new ModelAndView("delete");
+		} catch (Exception e) {
+		}
+		return null;
+	}
+	
+	@RequestMapping(value = "pwd_ck.do", produces = "text/html; charset=utf-8")
+	@ResponseBody
+	public String pwd_ckCommand(@ModelAttribute("pwd")String pwd,
+			@ModelAttribute("idx")String idx) {
+		try {
+			VO vo = new VO();
+			vo.setIdx(idx);
+			vo.setPwd(pwd);
+			int result = myService.selectPwdChk(vo);
+			return String.valueOf(result);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
+	@RequestMapping(value = "update_ok.do", method = RequestMethod.POST)
+	public ModelAndView updateOKCommand(VO vo, HttpServletRequest request,
+			@ModelAttribute("cPage")String cPage) {
+		try {
+			String path = request.getSession().getServletContext().getRealPath("/resources/upload");
+			MultipartFile file = vo.getF_name();
+			String old_file_name = request.getParameter("old_file_name");
+			if(file.isEmpty()) {
+				vo.setFile_name(old_file_name);
+			}else {
+				vo.setFile_name(file.getOriginalFilename());
+			}
+			int result = myService.updateList(vo);
+			if(! file.isEmpty()) {
+				byte[] in = file.getBytes();
+				File out = new File(path, vo.getFile_name());
+				FileCopyUtils.copy(in, out);
+			}
+			return new ModelAndView("redirect:onelist.do?idx="+vo.getIdx());
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
+	@RequestMapping("delete_ok.do")
+	public ModelAndView deleteOKCommand(@ModelAttribute("cPage")String cPage,
+			@RequestParam("idx")String idx) {
+		try {
+			VO vo = myService.selectOneList(idx);
+			// 원글과 댓글 구분해서 삭제 하자
+			int result = 0 ;
+			if(Integer.parseInt(vo.getStep()) == 0) {
+				// 원글일 경우 댓글 전체 삭제 
+				result = myService.delete(vo.getGroups());
+			}else {
+				result = myService.deleteAns(idx);
+			}
+			if(result>0) {
+				return new ModelAndView("redirect:list.do");
+			}
+			
+		} catch (Exception e) {
 		}
 		return null;
 	}

@@ -50,6 +50,26 @@
 		insert into board values(board_seq.nextval, #{writer},#{title},#{content},
 		#{pwd},0,#{groups}, #{step}, #{lev}, sysdate, #{file_name})
 	</insert>
+	
+	<!-- 수정, 삭제 비번 체크 -->
+	<select id="pwd_chk" parameterType="com.ict.vo.VO" resultType="int">
+		select count(*) from board where idx=#{idx} and pwd =#{pwd}
+	</select>
+	
+	<!-- update -->
+	<update id="update" parameterType="com.ict.vo.VO">
+		update board set title=#{title},content=#{content},file_name=#{file_name} where idx=#{idx}
+	</update>
+	
+	<!-- 원글 삭제시 하위 댓글도 모두 삭제  -->
+	<delete id="delete" parameterType="String">
+		delete from board where groups = #{groups}
+	</delete>
+	
+	<!-- 댓글 삭제시 댓글만 삭제 -->
+	<delete id="delete_ans" parameterType="String">
+		delete from board where idx = #{idx}
+	</delete>
 </mapper>
 
 

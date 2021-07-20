@@ -48,23 +48,24 @@ public class MyServiceImpl implements MyService{
 	public int InsertAns(VO vo) throws Exception {
 		return myDAO.InsertAns(vo);
 	}
-
+	@Override
+	public int selectPwdChk(VO vo) throws Exception {
+		return myDAO.selectPwdChk(vo);
+	}
+	
 	@Override
 	public int updateList(VO vo) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return myDAO.updateList(vo);
 	}
 
 	@Override
 	public int delete(String groups) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return myDAO.delete(groups);
 	}
 
 	@Override
 	public int deleteAns(String idx) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		return myDAO.deleteAns(idx);
 	}
 	
 }
