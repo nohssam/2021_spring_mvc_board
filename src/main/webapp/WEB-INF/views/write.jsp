@@ -25,7 +25,7 @@ input{padding: 5px;}
 </style>
 <script type="text/javascript">
 	function list_go(f) {
-		f.action="${pageContext.request.contextPath}/MyController?cmd=list&cPage=${cPage}";
+		f.action="list.do?cPage=${cPage}";
 		f.submit();
 	}
 	function write_ok(f) {
@@ -38,7 +38,7 @@ input{padding: 5px;}
 				return;
 			}
 		}
-		f.action="${pageContext.request.contextPath}/MyController?cmd=write_ok";
+		f.action="write_ok.do";
 		f.submit();
 	}
 </script>
@@ -65,7 +65,7 @@ input{padding: 5px;}
 			</tr>
 			<tr>
 				<th>첨부파일</th>
-				<td align="left"><input type="file" name="file_name"></td>
+				<td align="left"><input type="file" name="f_name"></td>
 			</tr>
 			<tr>
 				<th>비밀번호</th>
@@ -76,7 +76,6 @@ input{padding: 5px;}
 				<input type="button" value="입력" onclick="write_ok(this.form)" /> 
 				<input type="button" value="목록" onclick="list_go(this.form)" /> 
 				<input type="reset" value="취소" />
-				<input type="hidden" name="cPage" value="${cPage }">
 				</td>
 			</tr>
             </tbody>

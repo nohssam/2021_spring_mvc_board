@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -27,15 +28,10 @@ public class MyController {
 	private Paging paging;
 
 	@RequestMapping("list.do")
-	public ModelAndView getList(@ModelAttribute("cPage")String cPage) {
-		return new ModelAndView("list");
-	}
-	
-	// 비동기 통식 하기 위함
-	@RequestMapping(value = "list_ajax.do", produces = "application/json; charset=utf-8")
-	@ResponseBody
-	public Map<String,Object> getList_Ajax(@RequestParam("cPage")String cPage) {
+	public ModelAndView listCommand(@ModelAttribute("cPage")String cPage) {
 		try {
+			ModelAndView mv = new ModelAndView("list");
+			
 			// 전체 게시물의 수
 			int count = myService.selectCount();
 			paging.setTotalRecord(count);
@@ -70,15 +66,42 @@ public class MyController {
 			}
 			List<VO> list = myService.selectList(paging.getBegin(), paging.getEnd());
 			
-			Map<String,Object>	map = new HashMap<String, Object>();
-			map.put("list", list);
-			map.put("paging", paging);
+			mv.addObject("list",list);
+			mv.addObject("pvo", paging);
 			
-			return map;
+			return mv;
 			
 		} catch (Exception e) {
 			System.out.println(e);
 		}
 		return null;
 	}
+	
+	@RequestMapping("write.do")
+	public ModelAndView writeCommand(@ModelAttribute("cPage")String cPage) {
+		return new ModelAndView("write");
+	}
+	@RequestMapping(value = "write_ok.do", method = RequestMethod.POST)
+	public ModelAndView writeOKCommand(VO vo) {
+		try {
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
